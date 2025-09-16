@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Product Page — Voice Bot</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img id="logo" src="assets/ktpl logo.png" class="logo" alt="logo">
+      <div>
+        <div id="title" class="title">Product Title</div>
+        <div id="sku" class="subtitle">SKU</div>
+      </div>
+    </header>
+
+    <main class="card">
+      <div class="left">
+        <div id="gallery">
+          <img id="mainImg" class="main-img" src="assets/wm1.png" alt="product">
+          <img id="mainImg" class="main-img" src="assets/wm2.png" alt="product">
+          <img id="mainImg" class="main-img" src="assets/wm3.png" alt="product">
+          <img id="mainImg" class="main-img" src="assets/wm4.png" alt="product">
+          <img id="mainImg" class="main-img" src="assets/wm5.png" alt="product">
+
+          <div id="thumbs" class="thumbs"></div>
+        </div>
+
+        <h3>Description</h3>
+        <p id="description" class="desc">Product description here...</p>
+
+        <h4>Features</h4>
+        <ul id="featuresList"></ul>
+      </div>
+
+      <aside class="right">
+        <div class="product-meta">
+          <div id="price" class="price">₹0</div>
+          <div id="pageUrl" class="subtitle"></div>
+        </div>
+
+        <!-- Language toggle -->
+        <div style="margin-top:8px;">
+          <label style="font-weight:600">Language:</label>
+          <select id="langSelect">
+            <option value="en">English</option>
+            <option value="gu">ગુજરાતી</option>
+          </select>
+        </div>
+
+        <!-- Voice controls -->
+        <div style="margin-top:10px">
+          <textarea id="userText" placeholder="Type your question..." style="width:100%;height:72px;"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button id="micBtn">🎤 Speak</button>
+            <button id="askBtn">Ask</button>
+            <button id="readDescBtn">🔊 Read Description</button>
+          </div>
+          <div id="transcript" style="margin-top:12px;color:var(--muted)">Assistant ready.</div>
+        </div>
+
+        <div style="margin-top:14px">
+          <div id="specs" class="specs"></div>
+        </div>
+
+
+      </aside>
+    </main>
+
+    <footer style="margin-top:18px;color:var(--muted);font-size:13px">
+      Host on GitHub Pages / static host. Use `?id=product-id&lang=en|gu` to open a specific product/language.
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
