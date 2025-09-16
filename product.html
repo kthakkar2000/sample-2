@@ -3,78 +3,319 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Product Page — Voice Bot</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Product Page — Product & Voice Bot</title>
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--accent:#0b71ff;--muted:#6b7280}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;margin:0;background:var(--bg);color:#111}
+    .container{max-width:900px;margin:36px auto;padding:20px}
+    header{display:flex;gap:16px;align-items:center}
+    .logo{width:64px;height:64px;border-radius:12px;object-fit:contain;background:#fff;padding:6px}
+    .title{font-size:20px;font-weight:700}
+    .subtitle{color:var(--muted);font-size:13px}
+    .card{background:var(--card);border-radius:12px;padding:20px;margin-top:18px;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
+    .grid{display:flex;gap:20px}
+    .left{flex:1}
+    .right{width:320px}
+    .product-img{width:100%;height:360px;object-fit:contain;background:#fafafa;border-radius:8px}
+    .thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .thumbs img{width:72px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent}
+    .thumbs img.active{border-color:var(--accent);transform:translateY(-2px)}
+    ul{padding-left:18px}
+    .controls{display:flex;gap:8px;margin-top:12px}
+    button{background:var(--accent);color:#fff;padding:10px 12px;border:none;border-radius:8px;cursor:pointer}
+    button.secondary{background:#eef2ff;color:var(--accent);border:1px solid rgba(11,113,255,0.12)}
+    .log{margin-top:12px;background:#f8fafc;padding:12px;border-radius:8px;color:var(--muted);min-height:60px}
+    .hint{font-size:13px;color:var(--muted);margin-top:6px}
+    footer{margin-top:20px;color:var(--muted);font-size:13px}
+    .qr{display:inline-block;padding:8px;background:#fff;border-radius:8px}
+    @media (max-width:880px){ .grid{flex-direction:column} .right{width:auto} }
+  </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <img id="logo" src="assets/ktpl new logo.png" class="logo" alt="logo">
+      <img id="logo" class="logo" src="assets/ktpl-new-logo.png" alt="logo"/>
       <div>
-        <div id="title" class="title">Product Title</div>
-        <div id="sku" class="subtitle">SKU</div>
+        <div id="productTitle" class="title">Product Title</div>
+        <div id="productTag" class="subtitle">Short tagline or model number</div>
       </div>
     </header>
 
-    <main class="card">
+    <div class="card grid">
       <div class="left">
-        <div id="gallery">
-          <img id="mainImg" class="main-img" src="assets/wm1.png" alt="product">
-          <img id="mainImg" class="main-img" src="assets/wm2.png" alt="product">
-          <img id="mainImg" class="main-img" src="assets/wm3.png" alt="product">
-          <img id="mainImg" class="main-img" src="assets/wm4.png" alt="product">
-          <img id="mainImg" class="main-img" src="assets/wm5.png" alt="product">
+        <img id="productImg" class="product-img" src="assets/wm1.avif" alt="product"/>
 
-          <div id="thumbs" class="thumbs"></div>
-        </div>
+        <!-- THUMBNAILS: will be filled by JS using PRODUCT_DATA.images -->
+        <div id="thumbs" class="thumbs" aria-hidden="false"></div>
 
-        <h3>Description</h3>
-        <p id="description" class="desc">Product description here...</p>
+        <h3 style="margin-top:14px">Description</h3>
+        <p id="productDesc">Product description goes here. This text explains main benefits and short summary. Use this for QR spoken description.</p>
 
-        <h4>Features</h4>
-        <ul id="featuresList"></ul>
+        <h4 style="margin-top:10px">Features</h4>
+        <ul id="featuresList">
+          <li>Feature 1</li>
+          <li>Feature 2</li>
+        </ul>
+
+        <div class="hint">Tip: Duplicate this file for every product and change the PRODUCT_DATA below, or host small JSON files under <code>products/</code> and open with <code>?id=product-id</code>.</div>
       </div>
 
-      <aside class="right">
-        <div class="product-meta">
-          <div id="price" class="price">₹0</div>
-          <div id="pageUrl" class="subtitle"></div>
-        </div>
-
-        <!-- Language toggle -->
-        <div style="margin-top:8px;">
-          <label style="font-weight:600">Language:</label>
-          <select id="langSelect">
-            <option value="en">English</option>
-            <option value="gu">ગુજરાતી</option>
-          </select>
-        </div>
-
-        <!-- Voice controls -->
-        <div style="margin-top:10px">
-          <textarea id="userText" placeholder="Type your question..." style="width:100%;height:72px;"></textarea>
-          <div style="display:flex;gap:8px;margin-top:8px;">
-            <button id="micBtn">🎤 Speak</button>
-            <button id="askBtn">Ask</button>
-            <button id="readDescBtn">🔊 Read Description</button>
+      <div class="right">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:700">Voice Assistant</div>
+            <div class="subtitle">Ask about this product — speak or type</div>
           </div>
-          <div id="transcript" style="margin-top:12px;color:var(--muted)">Assistant ready.</div>
+          <div class="qr">QR: <small id="qrHint">Scan to open</small></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <textarea id="userText" placeholder="Type your question..." style="width:100%;height:88px;padding:8px;border-radius:8px;border:1px solid #eef2ff"></textarea>
+
+          <!-- Language toggle -->
+          <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+            <label style="font-weight:600">Language:</label>
+            <select id="langSelect" style="padding:6px 10px; border-radius:8px;">
+              <option value="en">English</option>
+              <option value="gu">ગુજરાતી</option>
+            </select>
+          </div>
+
+          <div class="controls" style="margin-top:10px">
+            <button id="startBtn">🎤 Speak</button>
+            <button id="askBtn" class="secondary">Ask</button>
+            <button id="readDescBtn" class="secondary">🔊 Read Description</button>
+          </div>
+          <div class="log" id="botLog">Assistant ready. Try: "How much water does it use?"</div>
         </div>
 
         <div style="margin-top:14px">
-          <div id="specs" class="specs"></div>
+          <div style="font-weight:700">Specs</div>
+          <table style="width:100%;margin-top:6px">
+            <tr><td class="subtitle">Capacity</td><td id="specCapacity">7 kg</td></tr>
+            <tr><td class="subtitle">Spin Speed</td><td id="specSpin">1200 RPM</td></tr>
+            <tr><td class="subtitle">Energy</td><td id="specEnergy">5 Star</td></tr>
+            <tr><td class="subtitle">Warranty</td><td id="specWarranty">2 yrs</td></tr>
+          </table>
         </div>
+      </div>
+    </div>
 
-
-      </aside>
-    </main>
-
-    <footer style="margin-top:18px;color:var(--muted);font-size:13px">
-      Host on GitHub Pages / static host. Use `?id=product-id&lang=en|gu` to open a specific product/language.
+    <footer>
+      To generate a QR for this product page: create a link to this page (for example <code>https://yourshop.github.io/product-page.html?id=washing-machine-7kg</code>) and make a QR from that URL. Host the file and any <code>products/*.json</code> on GitHub Pages or any static host.
     </footer>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    /* ======================================================
+       Gallery + English/ Gujarati voice bot (client-only)
+       - Place images in assets/:
+         assets/wm1.avif ... assets/wm5.avif
+         assets/ktpl-new-logo.png
+       ======================================================== */
+
+    // ------------------ CANNED RESPONSES (EN + GU) ------------------
+    const canned = [
+      { q: /price|cost|₹|rupee/i, a: 'The price of this model is Sixty five thousand rupees only.', gu: 'આ મોડેલની કિંમત રૂ. 65,000 છે. સ્ટોરમાં EMI અને exchange ઉપલબ્ધ છે.' },
+      { q: /stock|available/i, a: 'This model has only 4 pieces left in stock. We also offer EMI and exchange options in-store.', gu: 'આ મોડેલના સ્ટોકમાં ફક્ત 4 પીસ બાકી છે. અમે સ્ટોરમાં EMI અને એક્સચેન્જ વિકલ્પો પણ પ્રદાન કરીએ છીએ.' },
+      { q: /warrant(?:y|ies)|guarantee/i, a: 'This product comes with a two year manufacturer warranty covering defects and parts.', gu: 'આ ઉત્પાદન સાથે 2 વર્ષની વોરંટી મળે છે જે ખામી અને ભાગોને ઢકે છે.' },
+      { q: /capacity|kg|weight/i, a: 'The machine has a 12 kilogram capacity — suitable for small families.', gu: 'આ મશીનની ક્ષમતા 12 કિગ્રા છે — નાનાં પરિવારો માટે પૂરતી.' },
+      { q: /rpm|spin|speed/i, a: 'Maximum spin speed is 1200 RPM which helps remove more water and reduce drying time.', gu: 'મહત્તમ સ્પિન સ્પીડ 1200 RPM છે જે વધુ પાણી દૂર કરવામાં અને સૂકવાને ટૂંકાવમાં મદદ કરે છે.' },
+      { q: /energy|star/i, a: 'This is a 5-star energy rated appliance — very efficient on power consumption.', gu: 'આ એક 5-સ્ટાર એનર્જી રેટેડ ઉપકરણ છે — પાવર ખર્ચમાં ખૂબ અસરકારક.' },
+      { q: /how to clean|clean|care/i, a: 'Use a mild detergent, run monthly drum clean cycle and wipe the door seal to avoid residue.', gu: 'હળવો ડિટર્જેન્ટ વાપરો, માસિક ડ્રમ ક્લીન સાઈકલ ચલાવો અને ડોર સીલ સાફ કરો.' },
+      { q: /brand|company|model/i, a: 'This model is from ABC Electronics, known for durability and advanced features.', gu: 'આ મોડેલ ABC ઇલેક્ટ્રોનિક્સનું છે, જે ટકાઉપણું અને અદ્યતન સુવિધાઓ માટે જાણીતું છે.' },
+      { q: /size|dimension|height|width|depth/i, a: 'The machine measures 85 cm in height, 60 cm in width and 55 cm in depth.', gu: 'આ મશીનની ઊંચાઈ 85 સેમી, પહોળાઈ 60 સેમી અને ઊંડાઈ 55 સેમી છે.' },
+      { q: /water|litre|consumption/i, a: 'This model consumes approximately 60 liters of water per full wash cycle.', gu: 'આ મોડેલ દરેક પૂર્ણ વોશ સાયકલમાં અંદાજે 60 લિટર પાણી વાપરે છે.' },
+      { q: /noise|sound|db|decibel/i, a: 'The machine operates at 52 dB during wash and 72 dB during spin — relatively quiet.', gu: 'આ મશીન ધોવાની પ્રક્રિયામાં 52 dB અને સ્પિન દરમિયાન 72 dB પર કાર્ય કરે છે — તુલનાત્મક રીતે શાંત છે.' },
+      { q: /delivery|install|setup/i, a: 'Free delivery and installation are provided within city limits.', gu: 'શહેરની અંદર મફત ડિલિવરી અને ઇન્સ્ટોલેશન આપવામાં આવે છે.' },
+      { q: /offer|discount|deal|sale/i, a: 'We currently have a festive discount available. Please check in-store for final price.', gu: 'હાલમાં તહેવારોમાં ડિસ્કાઉન્ટ ઉપલબ્ધ છે. અંતિમ કિંમત માટે સ્ટોરમાં તપાસો.' },
+      { q: /service|repair|support|help/i, a: 'We provide doorstep service and free checkups during warranty period.', gu: 'અમે વોરંટી સમયગાળા દરમિયાન ડોરસ્ટેપ સર્વિસ અને મફત ચેકઅપ્સ પ્રદાન કરીએ છીએ.' },
+      { q: /exchange|old machine|return/i, a: 'You can exchange your old appliance and get up to ₹5,000 off.', gu: 'તમે તમારું જૂનું ઉપકરણ એક્સચેન્જ કરી શકો છો અને ₹5,000 સુધીની છૂટ મેળવી શકો છો.' },
+      { q: /.*/, a: 'Sorry, I do not have that exact information. You can ask about price, capacity, warranty or cleaning and I will answer.', gu: 'માફ કરશો, મારા પાસે તે ચોક્કસ માહિતી નથી. તમે કિંમત, ક્ષમતા, વોરંટી અથવા સાફસફાઈ વિશે પૂછો.' }
+    ];
+
+    // ------------------ PRODUCT DATA (images array included) ------------------
+    const PRODUCT_DATA = {
+      id: 'washing-machine-7kg',
+      title: 'SuperClean 7 kg Front Load',
+      title_gu: 'સોપરક્લીન 7 કિગ્રા ફ્રન્ટ લોડ',
+      tagline: 'Efficient • Quiet • Durable',
+      img: 'assets/wm1.avif',
+      images: [
+        'assets/wm1.avif',
+        'assets/wm2.avif',
+        'assets/wm3.avif',
+        'assets/wm4.avif',
+        'assets/wm5.avif'
+      ],
+      logo: 'assets/ktpl-new-logo.png',
+      description: 'This 7 kg front-load washing machine provides powerful cleaning with inverter technology, 8 wash programs, and a stainless steel drum for gentle care. Ideal for small to medium families.',
+      description_gu: 'આ 7 કિગ્રા ફ્રન્ટ-લોડ વોશિંગ મશીન ઇન્વર્ટર ટેક્નોલોજી અને 8 વોશ પ્રોગ્રામ્સ સાથે શક્તિશાળી સફાઈ આપે છે. નાના-મધ્યમ પરિવારો માટે આદર્શ.',
+      features: ['7 kg capacity', 'Inverter motor', 'Quick wash 30 min', 'Child lock', '1200 RPM spin'],
+      features_gu: ['7 કિગ્રા ક્ષમતા', 'ઇન્વર્ટર મોટર', 'ફાસ્ટ વોશ 30 મિનિટ', 'બાળકો માટે લોક', '1200 RPM'],
+      specs: { capacity: '7 kg', spin: '1200 RPM', energy: '5 Star', warranty: '2 years product / 10 years motor' },
+      specs_gu: { ક્ષમતા: '7 કિગ્રા', સ્પિન: '1200 RPM', એનર્જી: '5 સ્ટાર', વોરંટી: '2 વર્ષ પ્રોડક્ટ / 10 વર્ષ મોટર' }
+    };
+
+    // ------------------ Helpers ------------------
+    function isGujaratiText(s){ return /[\u0A80-\u0AFF]/.test(String(s)); }
+    function appendLog(txt){ const el=document.getElementById('botLog'); if(el) el.textContent = txt; }
+
+    // ------------------ Load product & render thumbs ------------------
+    async function loadProduct(){
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id');
+      let data = PRODUCT_DATA;
+      if(id){
+        try{
+          const resp = await fetch('products/' + id + '.json');
+          if(resp.ok) data = await resp.json();
+        }catch(e){ console.warn('Could not load products/'+id+'.json — using inline PRODUCT_DATA') }
+      }
+
+      // language param
+      const langParam = params.get('lang');
+      window._LANG = langParam === 'gu' ? 'gu' : 'en';
+
+      // populate UI
+      const title = (window._LANG==='gu' && data.title_gu) ? data.title_gu : data.title;
+      document.getElementById('productTitle').textContent = title;
+      document.getElementById('productTag').textContent = data.tagline || '';
+      document.getElementById('productImg').src = data.img || (data.images && data.images[0]) || 'assets/default-product.png';
+      document.getElementById('logo').src = data.logo || 'assets/ktpl-new-logo.png';
+      document.getElementById('productDesc').textContent = (window._LANG==='gu' && data.description_gu) ? data.description_gu : data.description;
+
+      // features
+      const fl = document.getElementById('featuresList'); fl.innerHTML = '';
+      const feats = (window._LANG==='gu' && data.features_gu) ? data.features_gu : data.features || [];
+      feats.forEach(f=>{ const li=document.createElement('li'); li.textContent=f; fl.appendChild(li); });
+
+      // specs (choose GU keys if present)
+      document.getElementById('specCapacity').textContent = (window._LANG==='gu' && data.specs_gu && data.specs_gu["ક્ષમતા"]) ? data.specs_gu["ક્ષમતા"] : (data.specs?.capacity || '');
+      document.getElementById('specSpin').textContent = (window._LANG==='gu' && data.specs_gu && data.specs_gu["સ્પિન"]) ? data.specs_gu["સ્પિન"] : (data.specs?.spin || '');
+      document.getElementById('specEnergy').textContent = (window._LANG==='gu' && data.specs_gu && data.specs_gu["એનર્જી"]) ? data.specs_gu["એનર્જી"] : (data.specs?.energy || '');
+      document.getElementById('specWarranty').textContent = (window._LANG==='gu' && data.specs_gu && data.specs_gu["વોરંટી"]) ? data.specs_gu["વોરંટી"] : (data.specs?.warranty || '');
+
+      // QR hint
+      const currentUrl = location.href.split('#')[0];
+      document.getElementById('qrHint').textContent = currentUrl;
+
+      window._PRODUCT = data;
+
+      // thumbs
+      const thumbsWrap = document.getElementById('thumbs'); thumbsWrap.innerHTML = '';
+      const imgs = data.images && data.images.length ? data.images : [data.img];
+      imgs.forEach((src, idx) => {
+        const im = document.createElement('img');
+        im.src = src;
+        if(idx===0) im.classList.add('active');
+        im.onclick = () => {
+          document.getElementById('productImg').src = src;
+          thumbsWrap.querySelectorAll('img').forEach(x=>x.classList.remove('active'));
+          im.classList.add('active');
+        };
+        thumbsWrap.appendChild(im);
+      });
+    }
+
+    loadProduct();
+
+    // ------------------ TTS ------------------
+    function speak(text){
+      if(!('speechSynthesis' in window)){ appendLog('Speech synthesis not supported'); return; }
+      const u = new SpeechSynthesisUtterance(text);
+      const lang = (window._LANG === 'gu' || isGujaratiText(text)) ? 'gu-IN' : 'en-IN';
+      u.lang = lang; u.rate = 1; u.pitch = 1;
+      const voices = window.speechSynthesis.getVoices();
+      if(voices && voices.length){
+        const v = voices.find(x=> x.lang && x.lang.toLowerCase().startsWith(lang.toLowerCase()));
+        if(v) u.voice = v;
+      } else {
+        window.speechSynthesis.onvoiceschanged = ()=> {
+          const v2 = window.speechSynthesis.getVoices().find(x=> x.lang && x.lang.toLowerCase().startsWith(lang.toLowerCase()));
+          if(v2) u.voice = v2;
+          window.speechSynthesis.speak(u);
+        };
+      }
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    }
+
+    // ------------------ localAnswer using canned ------------------
+    function localAnswer(q){
+      if(!q){ const fb=canned[canned.length-1]; return (window._LANG==='gu') ? fb.gu : fb.a; }
+      const text = String(q).trim();
+      const preferGu = (window._LANG === 'gu') || isGujaratiText(text);
+      for(let i=0;i<canned.length;i++){
+        try{ if(canned[i].q.test(text)) return preferGu ? (canned[i].gu || canned[i].a) : (canned[i].a || canned[i].gu); }
+        catch(e){ console.warn('Invalid regex', e); }
+      }
+      const fb=canned[canned.length-1]; return preferGu ? fb.gu : fb.a;
+    }
+
+    // ------------------ UI handlers ------------------
+    document.getElementById('askBtn').addEventListener('click', ()=>{
+      const q = document.getElementById('userText').value.trim(); if(!q) return;
+      appendLog('You: ' + q);
+      const ans = localAnswer(q);
+      appendLog((window._LANG==='gu' ? 'સહાયક: ' : 'Assistant: ') + ans);
+      speak(ans);
+    });
+
+    document.getElementById('readDescBtn').addEventListener('click', ()=>{
+      const p = window._PRODUCT || PRODUCT_DATA;
+      const text = (window._LANG==='gu' && p.description_gu) ? p.description_gu : p.description;
+      appendLog('Reading description...');
+      speak(text);
+    });
+
+    document.getElementById('langSelect').addEventListener('change', (e)=>{
+      window._LANG = e.target.value === 'gu' ? 'gu' : 'en';
+      const p = window._PRODUCT || PRODUCT_DATA;
+      document.getElementById('productTitle').textContent = (window._LANG==='gu' && p.title_gu) ? p.title_gu : p.title;
+      document.getElementById('productDesc').textContent = (window._LANG==='gu' && p.description_gu) ? p.description_gu : p.description;
+      const fl = document.getElementById('featuresList'); fl.innerHTML = '';
+      const feats = (window._LANG==='gu' && p.features_gu) ? p.features_gu : p.features || [];
+      feats.forEach(f=>{ const li=document.createElement('li'); li.textContent=f; fl.appendChild(li); });
+      document.getElementById('specCapacity').textContent = (window._LANG==='gu' && p.specs_gu && p.specs_gu["ક્ષમતા"]) ? p.specs_gu["ક્ષમતા"] : (p.specs?.capacity || '');
+      document.getElementById('specSpin').textContent = (window._LANG==='gu' && p.specs_gu && p.specs_gu["સ્પિન"]) ? p.specs_gu["સ્પિન"] : (p.specs?.spin || '');
+      document.getElementById('specEnergy').textContent = (window._LANG==='gu' && p.specs_gu && p.specs_gu["એનર્જી"]) ? p.specs_gu["એનર્જી"] : (p.specs?.energy || '');
+      document.getElementById('specWarranty').textContent = (window._LANG==='gu' && p.specs_gu && p.specs_gu["વોરંટી"]) ? p.specs_gu["વોરંટી"] : (p.specs?.warranty || '');
+    });
+
+    // ------------------ Speech recognition ------------------
+    let recognizing=false, recognition=null;
+    const startBtn = document.getElementById('startBtn');
+    try {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if(SpeechRecognition){
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-IN'; recognition.interimResults = false; recognition.maxAlternatives = 1;
+        recognition.onstart = ()=>{ recognizing=true; startBtn.textContent='🎙️ Listening... (click to stop)'; }
+        recognition.onend = ()=>{ recognizing=false; startBtn.textContent='🎤 Speak'; }
+        recognition.onerror = (e)=>{ appendLog('Recognition error: '+e.error); }
+        recognition.onresult = (ev)=>{
+          const text = ev.results[0][0].transcript;
+          document.getElementById('userText').value = text;
+          appendLog('You (spoken): ' + text);
+          if(isGujaratiText(text)) window._LANG = 'gu';
+          const a = localAnswer(text);
+          appendLog((window._LANG==='gu' ? 'સહાયક: ' : 'Assistant: ') + a);
+          speak(a);
+        };
+      } else { startBtn.style.display='none'; appendLog('Speech Recognition not supported in this browser'); }
+    } catch(e){ console.error(e); startBtn.style.display='none'; }
+
+    startBtn.addEventListener('click', ()=>{
+      if(!recognition){
+        const q = prompt((window._LANG==='gu') ? 'વાક્ય લખો:' : 'Type your question:');
+        if(q){ document.getElementById('userText').value=q; const a=localAnswer(q); appendLog((window._LANG==='gu'?'સહાયક: ':'Assistant: ')+a); speak(a); }
+        return;
+      }
+      if(recognizing) recognition.stop(); else { recognition.lang = (window._LANG==='gu') ? 'gu-IN' : 'en-IN'; recognition.start(); }
+    });
+
+    // End script
+  </script>
 </body>
 </html>
-
